@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandpile 3D Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/3d-force-graph"></script>
+    <style>
+        #graph-container {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">SANDPILES</div>
+    </header>
+
+    <main>
+        <div class="controls-panel">
+            <h2>Parameters</h2>
+
+            <div class="control-group">
+                <div class="label-row">
+                    <span class="label-text">Cube Dimension</span>
+                    <span id="grid-size-val" class="value-badge">5</span>
+                </div>
+                <input type="range" id="grid-size" min="3" max="10" value="5">
+            </div>
+
+            <div class="control-group">
+                <h2>Utilities</h2>
+                <button id="add-connection" class="action-btn">Add Connection</button>
+                <button id="remove-connection" class="action-btn">Remove Connection</button>
+                <button id="add-dropper" class="action-btn">Add Dropper</button>
+            </div>
+
+            <p class="hint">Left-click nodes in the 3D space to add sand.</p>
+        </div>
+
+        <div id="graph-container"></div>
+    </main>
+
+    <script src="graphHandler.js"></script>
+</body>
+
+</html>
