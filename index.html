@@ -9,14 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/3d-force-graph"></script>
-    <style>
-        #graph-container {
-            width: 100%;
-            height: 100%;
-            background: transparent;
-        }
-    </style>
+    <script src="https://unpkg.com/force-graph"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -46,7 +40,21 @@
             <p class="hint">Left-click nodes in the 3D space to add sand.</p>
         </div>
 
+        <div class="chart-panel">
+            <div class="info-header">Statistics</div>
+            <div class="chart-container">
+                <canvas id="stats-chart"></canvas>
+            </div>
+        </div>
+
         <div id="graph-container"></div>
+
+        <div class="info-panel">
+            <div class="info-header">Log</div>
+            <div class="info-item">
+                <p class="log"></p>
+            </div>
+        </div>
     </main>
 
     <script src="graphHandler.js"></script>

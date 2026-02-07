@@ -2,6 +2,8 @@ const addConnectionBtn = document.getElementById('add-connection');
 const removeConnectionBtn = document.getElementById('remove-connection');
 const addDropperBtn = document.getElementById('add-dropper');
 
+
+
 let nodesQueue = [];
 
 function addConnection(source, target) {
@@ -57,8 +59,8 @@ function addDropper(nodeId) {
     if (!nodes.find(n => n.id === nodeId)) return;
 
     setInterval(() => {
-        dropSand(nodeId);
-    }, 400);
+        dropSand(nodeId, true);
+    }, 100);
 }
 
 function initGraph(size) {
@@ -76,19 +78,21 @@ function initGraph(size) {
             });
 
             if (!Graph) {
-                Graph = ForceGraph3D()
+                Graph = ForceGraph()
                     (document.getElementById('graph-container'))
                     .graphData(data)
                     .nodeRelSize(8)
                     .nodeLabel(node => `Sand: ${node.sand} / ${node.capacity}`)
                     .nodeAutoColorBy('capacity')
                     .onNodeClick(node => onNodeClick(node.id))
+                    .linkColor(() => 'rgba(255, 255, 255, 0.1)')
                     .nodeColor(node => {
                         if (node.sand === 0) return '#cccccc';
                         const color = 255 - Math.floor(node.sand / node.capacity * 255);
                         const colorHex = color.toString(16).padStart(2, '0');
                         return `#ff${colorHex}00`;
-                    });
+                    })
+                    .backgroundColor('rgba(0,0,0,0)'); // Ensure transparency
             } else {
                 Graph.graphData(data);
             }
@@ -112,34 +116,43 @@ function onNodeClick(nodeId) {
         addDropper(nodeId);
     }
     else {
-        dropSand(nodeId);
+        dropSand(nodeId, true);
     }
 }
 
-function dropSand(nodeId) {
+function dropSand(nodeId, log = false) {
     const { nodes } = Graph.graphData();
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return;
 
     node.sand += 1;
+    let avalancheSize = 0;
 
     if (node.sand >= node.capacity) {
         node.sand = 0;
+        avalancheSize = 1;
         const neighbors = adjacency[nodeId] || [];
         neighbors.forEach(neighborId => {
             try {
-                dropSand(neighborId);
+                avalancheSize += dropSand(neighborId);
             } catch (e) {
-                alert("Sandpile Overfull");
+                document.querySelector('.log').innerText += `\nSandpile Overfull`;
             }
         });
     }
 
     Graph.nodeColor(Graph.nodeColor());
+
+    if (log && avalancheSize > 0) {
+        document.querySelector('.log').innerText += `\nAvalanche Size: ${avalancheSize}`;
+    }
+
+    return avalancheSize;
 }
 
 const slider = document.getElementById('grid-size');
 const sizeVal = document.getElementById('grid-size-val');
+
 let Graph;
 let adjacency = {};
 
@@ -176,3 +189,49 @@ addDropperBtn.addEventListener('click', () => {
 });
 
 initGraph(5);
+
+const ctx = document.getElementById('stats-chart').getContext('2d');
+const statsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: Array.from({ length: 20 }, (_, i) => i + 1),
+        datasets: [{
+            label: 'Topple Frequency',
+            data: Array.from({ length: 20 }, () => Math.pow(10, Math.random() * 5)),
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 3,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                ticks: { color: '#94a3b8', font: { size: 10 } }
+            },
+            y: {
+                type: 'logarithmic',
+                min: 1,
+                max: 100000,
+                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                afterBuildTicks: (axis) => {
+                    const ticks = [1, 10, 100, 1000, 10000, 100000];
+                    axis.ticks = ticks.map(v => ({ value: v }));
+                },
+                ticks: {
+                    color: '#94a3b8',
+                    font: { size: 10 },
+                    callback: (value) => value.toLocaleString()
+                }
+            }
+        }
+    }
+});
