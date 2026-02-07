@@ -1,7 +1,8 @@
-const slider = document.getElementById('grid-size');
-const sizeVal = document.getElementById('grid-size-val');
-let Graph;
-let adjacency = {};
+const addConnectionBtn = document.getElementById('add-connection');
+const removeConnectionBtn = document.getElementById('remove-connection');
+const addDropperBtn = document.getElementById('add-dropper');
+
+let nodesQueue = [];
 
 function addConnection(source, target) {
     source = parseInt(source);
@@ -78,9 +79,10 @@ function initGraph(size) {
                 Graph = ForceGraph3D()
                     (document.getElementById('graph-container'))
                     .graphData(data)
+                    .nodeRelSize(8)
                     .nodeLabel(node => `Sand: ${node.sand} / ${node.capacity}`)
                     .nodeAutoColorBy('capacity')
-                    .onNodeClick(node => dropSand(node.id))
+                    .onNodeClick(node => onNodeClick(node.id))
                     .nodeColor(node => {
                         if (node.sand === 0) return '#cccccc';
                         const color = 255 - Math.floor(node.sand / node.capacity * 255);
@@ -91,6 +93,27 @@ function initGraph(size) {
                 Graph.graphData(data);
             }
         });
+}
+
+function onNodeClick(nodeId) {
+    if (addConnectionBtn.classList.contains('active')) {
+        nodesQueue.push(nodeId);
+        if (nodesQueue.length === 2) {
+            addConnection(nodesQueue.pop(), nodesQueue.pop());
+        }
+    }
+    else if (removeConnectionBtn.classList.contains('active')) {
+        nodesQueue.push(nodeId);
+        if (nodesQueue.length === 2) {
+            removeConnection(nodesQueue.pop(), nodesQueue.pop());
+        }
+    }
+    else if (addDropperBtn.classList.contains('active')) {
+        addDropper(nodeId);
+    }
+    else {
+        dropSand(nodeId);
+    }
 }
 
 function dropSand(nodeId) {
@@ -104,12 +127,21 @@ function dropSand(nodeId) {
         node.sand = 0;
         const neighbors = adjacency[nodeId] || [];
         neighbors.forEach(neighborId => {
-            dropSand(neighborId);
+            try {
+                dropSand(neighborId);
+            } catch (e) {
+                alert("Sandpile Overfull");
+            }
         });
     }
 
     Graph.nodeColor(Graph.nodeColor());
 }
+
+const slider = document.getElementById('grid-size');
+const sizeVal = document.getElementById('grid-size-val');
+let Graph;
+let adjacency = {};
 
 let debounceTimer;
 slider.oninput = function () {
@@ -122,25 +154,25 @@ slider.oninput = function () {
     }, 10);
 };
 
-const addConnectionBtn = document.getElementById('add-connection');
-const removeConnectionBtn = document.getElementById('remove-connection');
-const addDropperBtn = document.getElementById('add-dropper');
-
 addConnectionBtn.addEventListener('click', () => {
-    const source = prompt('Enter source node ID:');
-    const target = prompt('Enter target node ID:');
-    addConnection(source, target);
+    const isActive = addConnectionBtn.classList.toggle('active');
+    removeConnectionBtn.classList.remove('active');
+    addDropperBtn.classList.remove('active');
+    nodesQueue = [];
 });
 
 removeConnectionBtn.addEventListener('click', () => {
-    const source = prompt('Enter source node ID:');
-    const target = prompt('Enter target node ID:');
-    removeConnection(source, target);
+    const isActive = removeConnectionBtn.classList.toggle('active');
+    addConnectionBtn.classList.remove('active');
+    addDropperBtn.classList.remove('active');
+    nodesQueue = [];
 });
 
 addDropperBtn.addEventListener('click', () => {
-    const nodeId = prompt('Enter node ID:');
-    if (nodeId !== null) addDropper(nodeId);
+    const isActive = addDropperBtn.classList.toggle('active');
+    addConnectionBtn.classList.remove('active');
+    removeConnectionBtn.classList.remove('active');
+    nodesQueue = [];
 });
 
 initGraph(5);
