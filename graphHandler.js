@@ -78,14 +78,14 @@ function initGraph(size) {
             });
 
             if (!Graph) {
-                Graph = ForceGraph()
+                Graph = ForceGraph3D()
                     (document.getElementById('graph-container'))
                     .graphData(data)
                     .nodeRelSize(8)
                     .nodeLabel(node => `Sand: ${node.sand} / ${node.capacity}`)
                     .nodeAutoColorBy('capacity')
                     .onNodeClick(node => onNodeClick(node.id))
-                    .linkColor(() => 'rgba(255, 255, 255, 0.1)')
+                    .linkColor(() => 'rgba(255, 255, 255, 1)')
                     .nodeColor(node => {
                         if (node.sand === 0) return '#cccccc';
                         const color = 255 - Math.floor(node.sand / node.capacity * 255);
