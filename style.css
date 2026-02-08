@@ -57,6 +57,13 @@ main {
     background: transparent;
 }
 
+#graph-container {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1;
+}
+
 .controls-panel {
     position: absolute;
     top: 2rem;
@@ -70,6 +77,11 @@ main {
     padding: 2rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     z-index: 20;
+    pointer-events: none;
+}
+
+.controls-panel>* {
+    pointer-events: auto;
 }
 
 h2 {
@@ -237,6 +249,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     z-index: 20;
     border-top: 4px solid var(--primary);
+    pointer-events: none;
+}
+
+.chart-panel>* {
+    pointer-events: auto;
 }
 
 .chart-container {

@@ -12,7 +12,7 @@ def serialize_graph(G):
         nodes.append({
             "id": node,
             "sand": 0,
-            "capacity": degree,
+            "capacity": 4,
             "val": 1
         })
     
