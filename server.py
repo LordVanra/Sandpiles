@@ -5,16 +5,24 @@ from graph import create_random_2_regular
 
 app = Flask(__name__, static_folder='.')
 
-def serialize_graph(G):
+def serialize_graph(G, three_d):
     nodes = []
     for node in G.nodes():
         degree = G.degree(node)
-        nodes.append({
-            "id": node,
-            "sand": 0,
-            "capacity": 4,
-            "val": 1
-        })
+        if(three_d):
+            nodes.append({
+                "id": node,
+                "sand": 0,
+                "capacity": 6,
+                "val": 1
+            })
+        else:
+            nodes.append({
+                "id": node,
+                "sand": 0,
+                "capacity": 4,
+                "val": 1
+            })
     
     links = []
     for u, v in G.edges():
@@ -37,10 +45,15 @@ def script():
 @app.route('/api/graph')
 def get_graph():
     size = int(request.args.get('size', 5))
+    three_d = request.args.get('three_d', 'false') == 'true'
     
     # Rerunning the graph generation logic
-    G = create_random_2_regular(size)
-    return jsonify(serialize_graph(G))
+    if(not three_d):
+        G = create_random_2_regular(size, 1)
+    else:
+        G = create_random_2_regular(size, size)
+    
+    return jsonify(serialize_graph(G, three_d))
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000) # Start the server at port 5000

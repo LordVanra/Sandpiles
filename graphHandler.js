@@ -58,13 +58,22 @@ function addDropper(nodeId) {
     const { nodes } = Graph.graphData();
     if (!nodes.find(n => n.id === nodeId)) return;
 
-    setInterval(() => {
-        dropSand(nodeId, true);
-    }, 10);
+    const fastMode = document.getElementById('speed-switch').checked;
+    if (fastMode) {
+        setInterval(() => {
+            dropSand(nodeId, true);
+        }, 10);
+    }
+    else {
+        setInterval(() => {
+            dropSand(nodeId, true);
+        }, 250);
+    }
 }
 
 function initGraph(size) {
-    fetch(`/api/graph?size=${size}`)
+    const three_d = document.getElementById('feature-switch').checked;
+    fetch(`/api/graph?size=${size}&three_d=${three_d}`)
         .then(res => res.json())
         .then(data => {
             adjacency = {};
@@ -153,7 +162,10 @@ function dropSand(nodeId, log = false) {
 
     if (avalancheSize > 0) {
         if (log) {
-            document.querySelector('.log').innerText += `\nAvalanche Size: ${avalancheSize}`;
+            const logEl = document.querySelector('.log');
+            logEl.innerText += `\nAvalanche: ${avalancheSize}`;
+            if (logEl.innerText.length > 1000) logEl.innerText = logEl.innerText.slice(-1000);
+            logEl.parentElement.scrollTop = logEl.parentElement.scrollHeight;
         }
 
         const currentCount = chartData.get(avalancheSize) || 0;
@@ -179,6 +191,10 @@ slider.oninput = function () {
     debounceTimer = setTimeout(() => {
         initGraph(val);
     }, 10);
+};
+
+document.getElementById('feature-switch').onchange = function () {
+    initGraph(slider.value);
 };
 
 addConnectionBtn.addEventListener('click', () => {
@@ -252,10 +268,17 @@ const statsChart = new Chart(ctx, {
     }
 });
 
-// Function to update chart from chartData Map
 function updateChart() {
     const sortedKeys = Array.from(chartData.keys()).sort((a, b) => a - b);
     statsChart.data.labels = sortedKeys;
     statsChart.data.datasets[0].data = sortedKeys.map(key => chartData.get(key));
     statsChart.update();
 }
+
+// Window resize handler
+window.addEventListener('resize', () => {
+    if (Graph) {
+        Graph.width(document.getElementById('graph-container').offsetWidth);
+        Graph.height(document.getElementById('graph-container').offsetHeight);
+    }
+});
