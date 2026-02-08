@@ -2,7 +2,7 @@ const addConnectionBtn = document.getElementById('add-connection');
 const removeConnectionBtn = document.getElementById('remove-connection');
 const addDropperBtn = document.getElementById('add-dropper');
 
-
+let chartData = new Map();
 
 let nodesQueue = [];
 
@@ -60,7 +60,7 @@ function addDropper(nodeId) {
 
     setInterval(() => {
         dropSand(nodeId, true);
-    }, 100);
+    }, 10);
 }
 
 function initGraph(size) {
@@ -78,21 +78,27 @@ function initGraph(size) {
             });
 
             if (!Graph) {
-                Graph = ForceGraph()
+                Graph = ForceGraph3D()
                     (document.getElementById('graph-container'))
                     .graphData(data)
                     .nodeRelSize(8)
                     .nodeLabel(node => `Sand: ${node.sand} / ${node.capacity}`)
                     .nodeAutoColorBy('capacity')
                     .onNodeClick(node => onNodeClick(node.id))
-                    .linkColor(() => 'rgba(255, 255, 255, 0.1)')
+                    .linkColor(() => 'rgba(255, 255, 255, 1)')
                     .nodeColor(node => {
                         if (node.sand === 0) return '#cccccc';
                         const color = 255 - Math.floor(node.sand / node.capacity * 255);
                         const colorHex = color.toString(16).padStart(2, '0');
                         return `#ff${colorHex}00`;
                     })
-                    .backgroundColor('rgba(0,0,0,0)'); // Ensure transparency
+                    .backgroundColor('rgba(0,0,0,0)');
+
+                setTimeout(() => {
+                    Graph.d3Force('charge').strength(-200);
+                    Graph.d3Force('link').distance(40).iterations(12);
+                    Graph.d3ReheatSimulation();
+                }, 100);
             } else {
                 Graph.graphData(data);
             }
@@ -122,29 +128,37 @@ function onNodeClick(nodeId) {
 
 function dropSand(nodeId, log = false) {
     const { nodes } = Graph.graphData();
-    const node = nodes.find(n => n.id === nodeId);
-    if (!node) return;
-
-    node.sand += 1;
+    const queue = [nodeId];
     let avalancheSize = 0;
 
-    if (node.sand >= node.capacity) {
-        node.sand = 0;
-        avalancheSize = 1;
-        const neighbors = adjacency[nodeId] || [];
-        neighbors.forEach(neighborId => {
-            try {
-                avalancheSize += dropSand(neighborId);
-            } catch (e) {
-                document.querySelector('.log').innerText += `\nSandpile Overfull`;
-            }
-        });
+    while (queue.length > 0) {
+        const nodeId = queue.shift();
+        const node = nodes.find(n => n.id === nodeId);
+        if (!node) continue;
+
+        node.sand += 1;
+
+        if (node.sand >= node.capacity) {
+            avalancheSize++;
+
+            node.sand = 0;
+            const neighbors = adjacency[nodeId] || [];
+            neighbors.forEach(neighborId => {
+                queue.push(neighborId);
+            });
+        }
     }
 
     Graph.nodeColor(Graph.nodeColor());
 
-    if (log && avalancheSize > 0) {
-        document.querySelector('.log').innerText += `\nAvalanche Size: ${avalancheSize}`;
+    if (avalancheSize > 0) {
+        if (log) {
+            document.querySelector('.log').innerText += `\nAvalanche Size: ${avalancheSize}`;
+        }
+
+        const currentCount = chartData.get(avalancheSize) || 0;
+        chartData.set(avalancheSize, currentCount + 1);
+        updateChart();
     }
 
     return avalancheSize;
@@ -194,10 +208,10 @@ const ctx = document.getElementById('stats-chart').getContext('2d');
 const statsChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: Array.from({ length: 20 }, (_, i) => i + 1),
+        labels: [],
         datasets: [{
             label: 'Topple Frequency',
-            data: Array.from({ length: 20 }, () => Math.pow(10, Math.random() * 5)),
+            data: [],
             borderColor: '#10b981',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             borderWidth: 2,
@@ -214,18 +228,20 @@ const statsChart = new Chart(ctx, {
         },
         scales: {
             x: {
+                type: 'logarithmic',
+                title: { display: true, text: 'Avalanche Size (s)', color: '#94a3b8' },
                 grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                ticks: { color: '#94a3b8', font: { size: 10 } }
+                ticks: {
+                    color: '#94a3b8',
+                    font: { size: 10 },
+                    callback: (value) => value.toLocaleString()
+                }
             },
             y: {
                 type: 'logarithmic',
+                title: { display: true, text: 'Frequency P(s)', color: '#94a3b8' },
                 min: 1,
-                max: 100000,
                 grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                afterBuildTicks: (axis) => {
-                    const ticks = [1, 10, 100, 1000, 10000, 100000];
-                    axis.ticks = ticks.map(v => ({ value: v }));
-                },
                 ticks: {
                     color: '#94a3b8',
                     font: { size: 10 },
@@ -235,3 +251,11 @@ const statsChart = new Chart(ctx, {
         }
     }
 });
+
+// Function to update chart from chartData Map
+function updateChart() {
+    const sortedKeys = Array.from(chartData.keys()).sort((a, b) => a - b);
+    statsChart.data.labels = sortedKeys;
+    statsChart.data.datasets[0].data = sortedKeys.map(key => chartData.get(key));
+    statsChart.update();
+}
