@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, send_from_directory
 import networkx as nx
 import os
-from graph import create_random_3_regular
+from graph import create_random_2_regular
 
 app = Flask(__name__, static_folder='.')
 
