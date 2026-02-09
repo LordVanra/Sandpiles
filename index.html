@@ -24,10 +24,10 @@
 
             <div class="control-group">
                 <div class="label-row">
-                    <span class="label-text">Cube Dimension</span>
+                    <span class="label-text">Size</span>
                     <span id="grid-size-val" class="value-badge">5</span>
                 </div>
-                <input type="range" id="grid-size" min="3" max="40" value="5">
+                <input type="range" id="grid-size" min="1" max="40" value="5">
             </div>
 
             <div class="control-group">
@@ -40,7 +40,7 @@
                     <span class="label-text">3D</span>
                 </div>
             </div>
-    
+
             <div class="control-group">
                 <div class="label-row toggle-row">
                     <span class="label-text">Slow</span>
@@ -66,6 +66,58 @@
             <div class="info-header">Statistics</div>
             <div class="chart-container">
                 <canvas id="stats-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="shape-toolbar">
+            <div class="shape-toolbar-inner">
+                <div class="shape-options shape-2d">
+                    <button class="shape-btn active" data-shape="square" title="Square Grid">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <rect x="2" y="2" width="16" height="16" rx="2" />
+                        </svg>
+                        <span>Square</span>
+                    </button>
+                    <button class="shape-btn" data-shape="hexagon" title="Hexagonal Grid">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 0L18.66 5V15L10 20L1.34 15V5L10 0Z" />
+                        </svg>
+                        <span>Hexagon</span>
+                    </button>
+                    <button class="shape-btn" data-shape="triangle" title="Triangle Grid">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 0L18.66 5V15L10 20L1.34 15V5L10 0Z" />
+                        </svg>
+                        <span>Triangle</span>
+                    </button>
+                </div>
+                <div class="shape-options shape-3d" style="display: none;">
+                    <button class="shape-btn active" data-shape="cube" title="Cube Grid">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 1L18 5.5V14.5L10 19L2 14.5V5.5L10 1Z" />
+                        </svg>
+                        <span>Cube</span>
+                    </button>
+                    <button class="shape-btn" data-shape="torus" title="Torus Grid">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 1L18 5.5V14.5L10 19L2 14.5V5.5L10 1Z" />
+                        </svg>
+                        <span>Torus</span>
+                    </button>
+                    <!-- <button class="shape-btn" data-shape="octahedron" title="Octahedron Grid">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 1L18 5.5V14.5L10 19L2 14.5V5.5L10 1Z" />
+                        </svg>
+                        <span>Octahedron</span>
+                    </button> -->
+                    <button class="shape-btn" data-shape="mobius" title="Mobius Strip">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                                d="M13.5 14.5A1.5 1.5 0 0 0 15 13V7A1.5 1.5 0 0 0 13.5 5.5H6.5A1.5 1.5 0 0 0 5 7V13A1.5 1.5 0 0 0 6.5 14.5H13.5M6.5 4H13.5A3 3 0 0 1 16.5 7V13A3 3 0 0 1 13.5 16H6.5A3 3 0 0 1 3.5 13V7A3 3 0 0 1 6.5 4Z" />
+                        </svg>
+                        <span>Mobius</span>
+                    </button>
+                </div>
             </div>
         </div>
 

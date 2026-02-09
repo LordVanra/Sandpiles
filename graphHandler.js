@@ -73,7 +73,7 @@ function addDropper(nodeId) {
 
 function initGraph(size) {
     const three_d = document.getElementById('feature-switch').checked;
-    fetch(`/api/graph?size=${size}&three_d=${three_d}`)
+    fetch(`/api/graph?size=${size}&three_d=${three_d}&shape=${currentShape}`)
         .then(res => res.json())
         .then(data => {
             adjacency = {};
@@ -194,8 +194,39 @@ slider.oninput = function () {
 };
 
 document.getElementById('feature-switch').onchange = function () {
+    updateShapeToolbar();
     initGraph(slider.value);
 };
+
+// Shape toolbar functionality
+let currentShape = 'square';
+
+function updateShapeToolbar() {
+    const is3D = document.getElementById('feature-switch').checked;
+    const shape2dOptions = document.querySelector('.shape-2d');
+    const shape3dOptions = document.querySelector('.shape-3d');
+
+    if (is3D) {
+        shape2dOptions.style.display = 'none';
+        shape3dOptions.style.display = 'flex';
+        currentShape = 'cube';
+    } else {
+        shape2dOptions.style.display = 'flex';
+        shape3dOptions.style.display = 'none';
+        currentShape = 'square';
+    }
+}
+
+document.querySelectorAll('.shape-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.closest('.shape-options').querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentShape = btn.dataset.shape;
+
+        // Reinitialize graph with new shape
+        initGraph(slider.value);
+    });
+});
 
 addConnectionBtn.addEventListener('click', () => {
     const isActive = addConnectionBtn.classList.toggle('active');
