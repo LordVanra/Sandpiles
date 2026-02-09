@@ -13,15 +13,23 @@
     font-family: 'Outfit', sans-serif;
 }
 
+html,
 body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    /* Allow growth */
     background-color: var(--bg);
-    height: 100vh;
-    width: 100vw;
-    overflow-x: hidden;
-    overflow-y: auto;
     color: var(--text);
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    /* Enable scrolling */
     transition: background-color 0.3s ease;
 }
 
@@ -311,74 +319,134 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 @media (max-width: 768px) {
     body {
+        min-height: 100vh;
         overflow-y: auto;
-        height: auto;
+        /* Ensure scrolling works on mobile */
     }
 
     header {
-        padding: 1rem;
-        position: sticky;
+        position: absolute;
         top: 0;
+        left: 0;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: transparent;
+        border-bottom: none;
+        pointer-events: none;
+        z-index: 10;
     }
 
     .logo {
         font-size: 1.2rem;
+        pointer-events: auto;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
     main {
         flex-direction: column;
         height: auto;
+        overflow: visible;
+        width: 100%;
     }
 
     #graph-container {
-        height: 60vh;
-        width: 100%;
-        order: -1;
-        background: radial-gradient(circle at center, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
-    }
-
-    .controls-panel,
-    .chart-panel,
-    .info-panel {
         position: relative;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        height: 60vh;
+        /* Fixed height for graph */
         width: 100%;
-        max-width: none;
-        border-radius: 0;
-        border: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 1.5rem;
-        backdrop-filter: none;
-        background: rgba(18, 18, 18, 0.95);
-        pointer-events: auto;
+        background: radial-gradient(circle at center, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+        z-index: 1;
+        order: -1;
+        /* Graph at the top */
     }
 
     .controls-panel {
+        position: relative;
+        /* Stack below graph */
+        top: auto;
+        bottom: auto;
+        left: auto;
+        width: 100%;
+        max-height: none;
+        padding: 1.5rem;
+        background: rgba(18, 18, 18, 0.95);
+        backdrop-filter: none;
+        border-radius: 0;
+        overflow-y: visible;
+        box-shadow: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        z-index: 2;
+    }
+
+    .chart-panel,
+    .info-panel {
+        display: none;
+        /* Hide chart and log on mobile to save space, or maybe toggle them? For now hiding to ensure clean look */
+    }
+
+    .shape-toolbar {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 100%;
+        margin: 0;
+        padding: 1rem;
+        background: rgba(18, 18, 18, 0.95);
+        z-index: 3;
+        order: 0;
+        /* Between graph and controls (if controls is natural order) */
+        /* Actually, let's just let it flow. 
+           HTML order: Controls, Chart, ShapeToolbar, Graph, Info.
+           We want visual order: Graph, ShapeToolbar, Controls.
+           Graph is order -1.
+           ShapeToolbar default order is 0.
+           Controls default order is 0.
+           Since Controls is before Toolbar in HTML, Controls will appear before Toolbar if both are order 0.
+           We want Toolbar BEFORE Controls.
+           So: Graph (order -1), Toolbar (order 0), Controls (order 1).
+        */
+    }
+
+    .controls-panel {
+        order: 1;
+    }
+
+    .shape-toolbar-inner {
+        width: 100%;
+        justify-content: center;
+        padding: 0.4rem;
+        background: transparent;
+        border: none;
         box-shadow: none;
     }
 
-    .chart-panel {
-        border-top: 4px solid var(--primary);
+    .shape-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+        flex: 1;
+        justify-content: center;
     }
 
-    .info-panel {
-        position: relative;
-        bottom: 0;
-        right: 0;
-        max-height: 400px;
-        border-left: none;
-        border-top: 4px solid var(--primary);
+    .shape-btn span {
+        display: none;
+        /* Keep text hidden on mobile if too small, or maybe show it? User said "parameters covers shape selection", so maybe they want to see it. */
+        display: block;
+        /* Let's show it if we have space now that it's stacked */
+        font-size: 0.7rem;
     }
 
-    .chart-container {
-        height: 250px;
+    .shape-options {
+        width: 100%;
+        justify-content: center;
     }
 
     h2 {
         font-size: 1rem;
+        margin-bottom: 1rem;
     }
 }
 
