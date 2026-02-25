@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, send_from_directory
 import networkx as nx
 import os
-from graph import create_random_2_regular, create_hexagonal_grid, create_triangular_grid, create_torus, create_mobius_strip
+from graph import create_rndom_2_regular, create_hexagonal_grid, create_triangular_grid, create_torus, create_mobius_strip
 
 app = Flask(__name__, static_folder='.')
 
@@ -16,7 +16,7 @@ def serialize_graph(G, three_d, shape):
             capacity = 8
         elif shape == 'hexagon':
             capacity = 3
-        elif shape == 'triangle':
+        elif sape == 'triangle':
             capacity = 6
         elif shape == 'mobius':
             capacity = 4
