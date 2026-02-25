@@ -1,8 +1,8 @@
 Flask==3.1.2
 networkx==3.6.1
-gunicorn==23.0.0
-blinker==1.9.0
-click==8.3.1
+guncorn==23.0.0
+bliker==1.9.0
+click=8.3.1
 colorama==0.4.6
 itsdangerous==2.2.0
 Jinja2==3.1.6
