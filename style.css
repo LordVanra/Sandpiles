@@ -17,9 +17,9 @@ html,
 body {
     margin: 0;
     padding: 0;
-    width: 100%;
-    min-height: 100%;
-    /* Allow growth */
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
     background-color: var(--bg);
     color: var(--text);
     font-family: 'Outfit', sans-serif;
@@ -28,8 +28,8 @@ body {
 body {
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    /* Enable scrolling */
+    overflow: hidden;
+    /* Disable scrolling */
     transition: background-color 0.3s ease;
 }
 
@@ -320,8 +320,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 @media (max-width: 768px) {
     body {
         min-height: 100vh;
-        overflow-y: auto;
-        /* Ensure scrolling works on mobile */
+        overflow: hidden;
+        /* Ensure scrolling is disabled on mobile */
     }
 
     header {
@@ -344,8 +344,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
     main {
         flex-direction: column;
-        height: auto;
-        overflow: visible;
+        height: 100%;
+        overflow: hidden;
         width: 100%;
     }
 

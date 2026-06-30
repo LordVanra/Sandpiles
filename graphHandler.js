@@ -90,7 +90,7 @@ function initGraph(size) {
                 Graph = ForceGraph3D()
                     (document.getElementById('graph-container'))
                     .graphData(data)
-                    .nodeRelSize(8)
+                    .nodeRelSize(12)
                     .nodeLabel(node => `Sand: ${node.sand} / ${node.capacity}`)
                     .nodeAutoColorBy('capacity')
                     .onNodeClick(node => onNodeClick(node.id))
